@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+.idea/
+.vscode/
+.DS_Store
+.pytest_cache/
+spark-warehouse/
+metastore_db/
+derby.log
+# local data produced by test runs
+/data/
+/local_lakehouse/

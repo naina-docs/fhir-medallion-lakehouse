@@ -1,0 +1,67 @@
+project:
+  name: fhir_medallion
+  environment: dev
+
+api:
+  base_url: https://hapi.fhir.org/baseR4
+  format: json
+  page_size: 100
+  max_pages_per_window: 50
+  timeout_seconds: 60
+  max_retries: 5
+  backoff_seconds: 2
+  sort_param: _lastUpdated
+  headers:
+    Accept: application/fhir+json
+
+ingestion:
+  lookback_days: 3
+  window_granularity: day
+  use_watermark: true
+
+resources:
+  - name: Patient
+    enabled: true
+    business_key: id
+  - name: Encounter
+    enabled: true
+    business_key: id
+  - name: Observation
+    enabled: true
+    business_key: id
+  - name: Condition
+    enabled: true
+    business_key: id
+
+storage:
+  root_path: /Volumes/fhir/landing/files
+  raw_folder: raw
+  checkpoint_folder: _state
+
+catalog:
+  catalog: fhir
+  schemas:
+    control: control
+    bronze: bronze
+    silver: silver
+    gold: gold
+
+tables:
+  control:
+    api_call_log: api_call_log
+    run_log: pipeline_run_log
+    watermark: ingestion_watermark
+  bronze_prefix: bronze_
+  silver_prefix: ""
+  gold:
+    dim_patient: dim_patient
+    fact_encounter: fact_encounter
+    fact_observation: fact_observation
+    fact_condition: fact_condition
+
+scd2:
+  hash_algorithm: sha2_256
+  effective_from_col: effective_from
+  effective_to_col: effective_to
+  current_flag_col: is_current
+  open_end_date: "9999-12-31 00:00:00"

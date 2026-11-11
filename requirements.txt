@@ -1,0 +1,8 @@
+# Runtime (already available on Databricks / Fabric Spark runtimes)
+pyspark>=3.5
+delta-spark>=3.1
+# Package dependencies
+requests>=2.31
+PyYAML>=6.0
+# Development
+pytest>=8.0
