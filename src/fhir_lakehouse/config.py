@@ -36,11 +36,20 @@ def load_config(path: str | os.PathLike | None = None, overrides: dict | None = 
     return cfg
 
 
-def table_name(cfg: dict, layer: str, name: str) -> str:
-    catalog = cfg["catalog"]["catalog"]
+def schema_name(cfg: dict, layer: str) -> str:
+    catalog = cfg["catalog"].get("catalog")
     schema = cfg["catalog"]["schemas"][layer]
-    return f"{catalog}.{schema}.{name}"
+    return f"{catalog}.{schema}" if catalog else schema
+
+
+def table_name(cfg: dict, layer: str, name: str) -> str:
+    return f"{schema_name(cfg, layer)}.{name}"
 
 
 def enabled_resources(cfg: dict) -> list[str]:
     return [r["name"] for r in cfg["resources"] if r.get("enabled", True)]
+
+
+def resource_table(cfg: dict, layer: str, resource: str) -> str:
+    prefix = cfg["tables"].get(f"{layer}_prefix", "")
+    return table_name(cfg, layer, f"{prefix}{resource.lower()}")

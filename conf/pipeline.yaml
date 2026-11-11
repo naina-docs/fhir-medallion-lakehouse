@@ -34,17 +34,19 @@ resources:
     business_key: id
 
 storage:
-  root_path: /Volumes/fhir/landing/files
+  root_path: /Volumes/workspace/fhir_landing/files
+  volume_schema: fhir_landing
+  volume_name: files
   raw_folder: raw
   checkpoint_folder: _state
 
 catalog:
-  catalog: fhir
+  catalog: workspace
   schemas:
-    control: control
-    bronze: bronze
-    silver: silver
-    gold: gold
+    control: fhir_control
+    bronze: fhir_bronze
+    silver: fhir_silver
+    gold: fhir_gold
 
 tables:
   control:
