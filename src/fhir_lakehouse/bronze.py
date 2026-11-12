@@ -63,9 +63,7 @@ def load_bronze(spark: SparkSession, cfg: dict, resource: str, run_id: str | Non
     df = build_bronze(spark, pending_files(spark, cfg, resource, run_id))
     if df is None:
         return 0
-    df = df.cache()
     rows = df.count()
     (df.write.format("delta").mode("append").option("mergeSchema", "true")
      .partitionBy("window_date").saveAsTable(resource_table(cfg, "bronze", resource)))
-    df.unpersist()
     return rows

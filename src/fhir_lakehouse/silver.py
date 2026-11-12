@@ -4,8 +4,7 @@ from pyspark.sql import DataFrame, SparkSession, Window
 from pyspark.sql import functions as F
 
 from .config import resource_table, schema_name
-
-LINEAGE_COLS = ["version_id", "last_updated", "extraction_timestamp", "source_run_id", "source_loaded_at"]
+from .scd2 import build_changes, merge_scd2, with_row_hash
 
 
 def column_expr(path: str, kind: str) -> str:
@@ -53,35 +52,17 @@ def flatten(bronze: DataFrame, cfg: dict, resource: str) -> DataFrame:
             ))
 
 
-def latest_per_key(df: DataFrame) -> DataFrame:
-    w = Window.partitionBy("resource_id").orderBy(
-        F.col("version_id").desc_nulls_last(),
-        F.col("last_updated").desc_nulls_last(),
-        F.col("extraction_timestamp").desc_nulls_last(),
-    )
+def dedup_versions(df: DataFrame) -> DataFrame:
+    w = Window.partitionBy("resource_id", "version_id").orderBy(F.col("extraction_timestamp").desc_nulls_last())
     return df.withColumn("_rn", F.row_number().over(w)).where("_rn = 1").drop("_rn")
 
 
-def upsert(spark: SparkSession, df: DataFrame, target: str) -> None:
-    df = df.withColumn("silver_updated_at", F.current_timestamp())
-    if not spark.catalog.tableExists(target):
-        df.write.format("delta").saveAsTable(target)
-        return
-    df.createOrReplaceTempView("_silver_src")
-    spark.sql(f"""
-        MERGE INTO {target} t
-        USING _silver_src s ON t.resource_id = s.resource_id
-        WHEN MATCHED AND (s.version_id > t.version_id OR (s.version_id = t.version_id AND s.last_updated > t.last_updated))
-          THEN UPDATE SET *
-        WHEN NOT MATCHED THEN INSERT *
-    """)
-
-
-def load_silver(spark: SparkSession, cfg: dict, resource: str) -> int:
+def load_silver(spark: SparkSession, cfg: dict, resource: str) -> dict:
     spark.sql(f"CREATE SCHEMA IF NOT EXISTS {schema_name(cfg, 'silver')}")
-    df = latest_per_key(flatten(new_bronze_rows(spark, cfg, resource), cfg, resource)).cache()
-    rows = df.count()
-    if rows:
-        upsert(spark, df, resource_table(cfg, "silver", resource))
-    df.unpersist()
-    return rows
+    opts = cfg["scd2"]
+    bits = int(opts["hash_algorithm"].split("_")[-1])
+    target = resource_table(cfg, "silver", resource)
+    src = with_row_hash(dedup_versions(flatten(new_bronze_rows(spark, cfg, resource), cfg, resource)),
+                        attribute_columns(cfg, resource), bits)
+    changes = build_changes(spark, src, target, "resource_id", ["version_id", "last_updated"], opts)
+    return merge_scd2(spark, changes, target, "resource_id", opts) if changes.take(1) else {"inserted": 0, "closed": 0}
