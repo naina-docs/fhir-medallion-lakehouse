@@ -33,6 +33,11 @@ def load_config(path: str | os.PathLike | None = None, overrides: dict | None = 
 
     if overrides:
         cfg = _deep_merge(cfg, overrides)
+
+    columns_file = cfg_path.with_name(cfg.get("silver", {}).get("columns_file", "silver_columns.yaml"))
+    if columns_file.exists() and "silver_columns" not in cfg:
+        with open(columns_file, encoding="utf-8") as fh:
+            cfg["silver_columns"] = yaml.safe_load(fh)
     return cfg
 
 

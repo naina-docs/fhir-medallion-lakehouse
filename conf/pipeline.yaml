@@ -1,6 +1,7 @@
 project:
   name: fhir_medallion
   environment: dev
+  timezone: UTC
 
 api:
   base_url: https://hapi.fhir.org/baseR4
@@ -60,6 +61,9 @@ tables:
     fact_encounter: fact_encounter
     fact_observation: fact_observation
     fact_condition: fact_condition
+
+silver:
+  columns_file: silver_columns.yaml
 
 scd2:
   hash_algorithm: sha2_256

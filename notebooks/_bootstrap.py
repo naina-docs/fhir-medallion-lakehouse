@@ -21,6 +21,7 @@ if dbutils.widgets.get("lookback_days"):
     overrides["ingestion"] = {"lookback_days": int(dbutils.widgets.get("lookback_days"))}
 
 cfg = load_config(os.path.join(repo_root, "conf", "pipeline.yaml"), overrides)
+spark.conf.set("spark.sql.session.timeZone", cfg["project"]["timezone"])
 run_id = dbutils.widgets.get("run_id") or uuid.uuid4().hex[:12]
 run_date = date.fromisoformat(dbutils.widgets.get("run_date")) if dbutils.widgets.get("run_date") else date.today()
 selected = [r.strip() for r in dbutils.widgets.get("resource").split(",") if r.strip()]

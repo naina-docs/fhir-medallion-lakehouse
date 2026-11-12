@@ -1,0 +1,63 @@
+Patient:
+  active: {path: $.active, type: boolean}
+  gender: {path: $.gender, type: lower}
+  birth_date: {path: $.birthDate, type: date}
+  deceased: {path: $.deceasedBoolean, type: boolean}
+  deceased_at: {path: $.deceasedDateTime, type: timestamp}
+  family_name: {path: "$.name[0].family", type: string}
+  given_name: {path: "$.name[0].given[0]", type: string}
+  phone: {path: "$.telecom[0].value", type: string}
+  city: {path: "$.address[0].city", type: string}
+  state: {path: "$.address[0].state", type: string}
+  postal_code: {path: "$.address[0].postalCode", type: string}
+  country: {path: "$.address[0].country", type: string}
+  marital_status: {path: $.maritalStatus.text, type: string}
+  language: {path: "$.communication[0].language.text", type: string}
+
+Encounter:
+  status: {path: $.status, type: lower}
+  class_code: {path: $.class.code, type: string}
+  class_display: {path: $.class.display, type: string}
+  type_code: {path: "$.type[0].coding[0].code", type: string}
+  type_display: {path: "$.type[0].coding[0].display", type: string}
+  patient_id: {path: $.subject.reference, type: ref}
+  practitioner_id: {path: "$.participant[0].individual.reference", type: ref}
+  service_provider_id: {path: $.serviceProvider.reference, type: ref}
+  reason_code: {path: "$.reasonCode[0].coding[0].code", type: string}
+  reason_text: {path: "$.reasonCode[0].text", type: string}
+  period_start: {path: $.period.start, type: timestamp}
+  period_end: {path: $.period.end, type: timestamp}
+
+Observation:
+  status: {path: $.status, type: lower}
+  category_code: {path: "$.category[0].coding[0].code", type: string}
+  code_system: {path: "$.code.coding[0].system", type: string}
+  code: {path: "$.code.coding[0].code", type: string}
+  code_display: {path: "$.code.coding[0].display", type: string}
+  code_text: {path: $.code.text, type: string}
+  patient_id: {path: $.subject.reference, type: ref}
+  encounter_id: {path: $.encounter.reference, type: ref}
+  effective_at: {path: $.effectiveDateTime, type: timestamp}
+  issued_at: {path: $.issued, type: timestamp}
+  value_number: {path: $.valueQuantity.value, type: double}
+  value_unit: {path: $.valueQuantity.unit, type: string}
+  value_text: {path: $.valueCodeableConcept.text, type: string}
+  value_string: {path: $.valueString, type: string}
+  interpretation_code: {path: "$.interpretation[0].coding[0].code", type: string}
+  ref_low: {path: "$.referenceRange[0].low.value", type: double}
+  ref_high: {path: "$.referenceRange[0].high.value", type: double}
+
+Condition:
+  clinical_status: {path: "$.clinicalStatus.coding[0].code", type: lower}
+  verification_status: {path: "$.verificationStatus.coding[0].code", type: lower}
+  category_code: {path: "$.category[0].coding[0].code", type: string}
+  code_system: {path: "$.code.coding[0].system", type: string}
+  code: {path: "$.code.coding[0].code", type: string}
+  code_display: {path: "$.code.coding[0].display", type: string}
+  code_text: {path: $.code.text, type: string}
+  severity: {path: "$.severity.coding[0].display", type: string}
+  patient_id: {path: $.subject.reference, type: ref}
+  encounter_id: {path: $.encounter.reference, type: ref}
+  onset_at: {path: $.onsetDateTime, type: timestamp}
+  abatement_at: {path: $.abatementDateTime, type: timestamp}
+  recorded_at: {path: $.recordedDate, type: timestamp}
