@@ -16,4 +16,5 @@ for resource in resources:
 
 # COMMAND ----------
 
-display(spark.createDataFrame([{k: v for k, v in r.items() if k != "files"} for r in results]))
+summary = [(r["resource"], r["windows"], r["pages"], r["entries"], r["resumed"]) for r in results]
+display(spark.createDataFrame(summary, "resource string, windows int, pages int, entries long, resumed int"))
