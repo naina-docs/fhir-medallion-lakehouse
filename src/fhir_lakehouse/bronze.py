@@ -43,7 +43,7 @@ def build_bronze(spark: SparkSession, calls: DataFrame) -> DataFrame:
         F.get_json_object("resource_json", "$.id").alias("resource_id"),
         F.get_json_object("resource_json", "$.resourceType").alias("resource_type"),
         F.get_json_object("resource_json", "$.meta.versionId").alias("version_id"),
-        F.to_timestamp(F.get_json_object("resource_json", "$.meta.lastUpdated")).alias("last_updated"),
+        F.expr("try_to_timestamp(get_json_object(resource_json, '$.meta.lastUpdated'))").alias("last_updated"),
         "resource_json",
         F.col("entry.fullUrl").alias("full_url"),
         F.col("api_called_at").alias("extraction_timestamp"),

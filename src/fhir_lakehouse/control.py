@@ -5,6 +5,7 @@ from contextlib import contextmanager
 from datetime import datetime, timezone
 
 from pyspark.sql import SparkSession
+from pyspark.sql import functions as F
 from pyspark.sql import types as T
 
 from .config import schema_name, table_name
@@ -45,7 +46,7 @@ WATERMARK_SCHEMA = T.StructType([
 
 
 def _now() -> datetime:
-    return datetime.now(timezone.utc).replace(tzinfo=None)
+    return datetime.now(timezone.utc)
 
 
 def control_table(cfg: dict, key: str) -> str:
@@ -68,10 +69,10 @@ def log_api_calls(spark: SparkSession, cfg: dict, rows: list[dict]) -> None:
 
 
 def get_watermark(spark: SparkSession, cfg: dict, resource: str) -> datetime | None:
-    row = (spark.table(control_table(cfg, "watermark"))
-           .where(f"resource = '{resource}'")
-           .agg({"last_window_end": "max"}).first())
-    return row[0] if row else None
+    micros = (spark.table(control_table(cfg, "watermark"))
+              .where(F.col("resource") == resource)
+              .agg(F.unix_micros(F.max("last_window_end"))).first()[0])
+    return datetime.fromtimestamp(micros / 1_000_000, tz=timezone.utc) if micros is not None else None
 
 
 def set_watermark(spark: SparkSession, cfg: dict, resource: str, window_end: datetime, run_id: str) -> None:

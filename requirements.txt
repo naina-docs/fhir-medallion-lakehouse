@@ -1,4 +1,4 @@
-# Runtime (already available on Databricks / Fabric Spark runtimes)
+# Runtime (already available on Databricks)
 pyspark>=3.5
 delta-spark>=3.1
 # Package dependencies

@@ -17,7 +17,6 @@ api:
 
 ingestion:
   lookback_days: 3
-  window_granularity: day
   use_watermark: true
 
 resources:
@@ -39,7 +38,6 @@ storage:
   volume_schema: fhir_landing
   volume_name: files
   raw_folder: raw
-  checkpoint_folder: _state
 
 catalog:
   catalog: workspace
