@@ -56,9 +56,18 @@ tables:
   silver_prefix: ""
   gold:
     dim_patient: dim_patient
+    dim_patient_history: dim_patient_history
+    dim_date: dim_date
     fact_encounter: fact_encounter
     fact_observation: fact_observation
     fact_condition: fact_condition
+    agg_daily_activity: agg_daily_activity
+    agg_condition_prevalence: agg_condition_prevalence
+
+gold:
+  unknown_key: "-1"
+  date_start: "2015-01-01"
+  date_future_days: 365
 
 silver:
   columns_file: silver_columns.yaml
