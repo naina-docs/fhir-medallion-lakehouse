@@ -1,0 +1,29 @@
+{
+  "resourceType": "Bundle",
+  "type": "searchset",
+  "link": [
+    {"relation": "self", "url": "https://hapi.fhir.org/baseR4/Patient?_count=2"},
+    {"relation": "next", "url": "https://hapi.fhir.org/baseR4?_getpages=abc&_getpagesoffset=2&_count=2"}
+  ],
+  "entry": [
+    {
+      "fullUrl": "https://hapi.fhir.org/baseR4/Patient/p1",
+      "resource": {
+        "resourceType": "Patient", "id": "p1",
+        "meta": {"versionId": "1", "lastUpdated": "2026-11-10T08:00:00.000+00:00"},
+        "active": true, "gender": " Female ", "birthDate": "1980-05-02",
+        "name": [{"family": "Rao", "given": ["Asha"]}],
+        "address": [{"city": "Pune", "country": "IN"}]
+      }
+    },
+    {
+      "fullUrl": "https://hapi.fhir.org/baseR4/Patient/p2",
+      "resource": {
+        "resourceType": "Patient", "id": "p2",
+        "meta": {"versionId": "3", "lastUpdated": "2026-11-10T09:30:00.000+00:00"},
+        "gender": "male", "birthDate": "1975",
+        "name": [{"family": "", "given": ["Ravi"]}]
+      }
+    }
+  ]
+}

@@ -56,7 +56,10 @@ def control_table(cfg: dict, key: str) -> str:
 def create_control_objects(spark: SparkSession, cfg: dict) -> None:
     for layer in cfg["catalog"]["schemas"]:
         spark.sql(f"CREATE SCHEMA IF NOT EXISTS {schema_name(cfg, layer)}")
-    for key, schema in [("api_call_log", API_CALL_LOG_SCHEMA), ("run_log", RUN_LOG_SCHEMA), ("watermark", WATERMARK_SCHEMA)]:
+    from .quality import DQ_SCHEMA
+
+    for key, schema in [("api_call_log", API_CALL_LOG_SCHEMA), ("run_log", RUN_LOG_SCHEMA),
+                        ("watermark", WATERMARK_SCHEMA), ("dq_results", DQ_SCHEMA)]:
         name = control_table(cfg, key)
         if not spark.catalog.tableExists(name):
             spark.createDataFrame([], schema).write.format("delta").saveAsTable(name)

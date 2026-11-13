@@ -20,15 +20,17 @@ def gold_views(cfg: dict) -> dict[str, str]:
     return {
         "dim_patient_history": f"""
             SELECT sk AS patient_key, {patient_cols},
-                   version_id, effective_from, effective_to, is_current
+                   version_id, effective_from, effective_to, is_current,
+                   extraction_timestamp, api_url_or_params
             FROM {s['Patient']}""",
         "dim_patient": f"""
             SELECT patient_key, patient_id, gender, birth_date, age_years, is_deceased, deceased_at,
-                   family_name, given_name, city, state, postal_code, country, marital_status, language, active
+                   family_name, given_name, city, state, postal_code, country, marital_status, language, active,
+                   extraction_timestamp, api_url_or_params
             FROM {g['dim_patient_history']} WHERE is_current
             UNION ALL
             SELECT '{unknown}', '{unknown}', NULL, NULL, NULL, NULL, NULL,
-                   NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL""",
+                   NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL""",
         "fact_encounter": f"""
             SELECT e.sk AS encounter_key, e.resource_id AS encounter_id, e.patient_id, {patient_key},
                    CAST(date_format(e.period_start, 'yyyyMMdd') AS INT) AS date_key,
@@ -37,7 +39,7 @@ def gold_views(cfg: dict) -> dict[str, str]:
                    e.practitioner_id, e.service_provider_id, e.period_start, e.period_end,
                    CASE WHEN e.period_end >= e.period_start
                         THEN (unix_timestamp(e.period_end) - unix_timestamp(e.period_start)) / 60 END AS duration_minutes,
-                   e.last_updated
+                   e.last_updated, e.extraction_timestamp, e.api_url_or_params
             FROM {s['Encounter']} e
             LEFT JOIN {g['dim_patient']} p ON p.patient_id = e.patient_id
             WHERE e.is_current""",
@@ -51,7 +53,7 @@ def gold_views(cfg: dict) -> dict[str, str]:
                    CASE WHEN o.value_number < o.ref_low THEN 'low'
                         WHEN o.value_number > o.ref_high THEN 'high'
                         WHEN o.ref_low IS NOT NULL OR o.ref_high IS NOT NULL THEN 'normal' END AS range_flag,
-                   o.effective_at, o.issued_at, o.last_updated
+                   o.effective_at, o.issued_at, o.last_updated, o.extraction_timestamp, o.api_url_or_params
             FROM {s['Observation']} o
             LEFT JOIN {g['dim_patient']} p ON p.patient_id = o.patient_id
             WHERE o.is_current""",
@@ -61,7 +63,7 @@ def gold_views(cfg: dict) -> dict[str, str]:
                    c.clinical_status, c.verification_status, c.category_code, c.code_system, c.code,
                    coalesce(c.code_display, c.code_text, c.code) AS code_name, c.severity,
                    c.clinical_status IN ('active', 'recurrence', 'relapse') AS is_active,
-                   c.onset_at, c.abatement_at, c.recorded_at, c.last_updated
+                   c.onset_at, c.abatement_at, c.recorded_at, c.last_updated, c.extraction_timestamp, c.api_url_or_params
             FROM {s['Condition']} c
             LEFT JOIN {g['dim_patient']} p ON p.patient_id = c.patient_id
             WHERE c.is_current""",

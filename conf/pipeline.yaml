@@ -52,6 +52,7 @@ tables:
     api_call_log: api_call_log
     run_log: pipeline_run_log
     watermark: ingestion_watermark
+    dq_results: dq_results
   bronze_prefix: bronze_
   silver_prefix: ""
   gold:
@@ -78,3 +79,9 @@ scd2:
   effective_to_col: effective_to
   current_flag_col: is_current
   open_end_date: "9999-12-31 00:00:00"
+
+quality:
+  allowed_gender: [male, female, other, unknown]
+  max_unknown_patient_ratio: 0.95
+  freshness_days: 3
+  fail_on_error: true

@@ -1,0 +1,25 @@
+<Bundle xmlns="http://hl7.org/fhir">
+  <type value="searchset"/>
+  <link><relation value="self"/><url value="https://hapi.fhir.org/baseR4/Patient?_count=2"/></link>
+  <link><relation value="next"/><url value="https://hapi.fhir.org/baseR4?_getpages=abc&amp;_getpagesoffset=2"/></link>
+  <entry>
+    <fullUrl value="https://hapi.fhir.org/baseR4/Patient/p1"/>
+    <resource>
+      <Patient>
+        <id value="p1"/>
+        <meta><versionId value="1"/><lastUpdated value="2026-11-10T08:00:00.000+00:00"/></meta>
+        <gender value="female"/>
+      </Patient>
+    </resource>
+  </entry>
+  <entry>
+    <fullUrl value="https://hapi.fhir.org/baseR4/Patient/p2"/>
+    <resource>
+      <Patient>
+        <id value="p2"/>
+        <meta><versionId value="3"/><lastUpdated value="2026-11-10T09:30:00.000+00:00"/></meta>
+        <gender value="male"/>
+      </Patient>
+    </resource>
+  </entry>
+</Bundle>

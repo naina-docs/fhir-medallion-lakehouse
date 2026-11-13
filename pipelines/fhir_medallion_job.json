@@ -230,6 +230,18 @@
         "notebook_path": "notebooks/04_gold/build_gold",
         "source": "GIT"
       }
+    },
+    {
+      "task_key": "quality",
+      "depends_on": [
+        {
+          "task_key": "gold"
+        }
+      ],
+      "notebook_task": {
+        "notebook_path": "notebooks/05_quality/run_quality_checks",
+        "source": "GIT"
+      }
     }
   ],
   "schedule": {

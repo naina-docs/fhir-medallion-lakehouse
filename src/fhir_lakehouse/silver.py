@@ -40,13 +40,16 @@ def flatten(bronze: DataFrame, cfg: dict, resource: str) -> DataFrame:
     mapping = cfg["silver_columns"][resource]
     attrs = [F.expr(column_expr(m["path"], m["type"])).alias(name) for name, m in mapping.items()]
     return (bronze
-            .where(F.col("resource_id").isNotNull() & (F.col("resource_type") == resource))
+            .where(F.col("resource_id").isNotNull() & (F.col("resource_type") == resource)
+                   & F.col("resource_json").isNotNull())
             .select(
                 "resource_id",
                 *attrs,
                 F.col("version_id").cast("long").alias("version_id"),
                 "last_updated",
                 "extraction_timestamp",
+                "api_url_or_params",
+                "raw_saved_at",
                 F.col("run_id").alias("source_run_id"),
                 F.col("bronze_loaded_at").alias("source_loaded_at"),
             ))
